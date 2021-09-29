@@ -1,32 +1,29 @@
 N = int(input())
 S = list(input())
 Q = int(input())
-T = []
-A = []
-B = []
-
-for _ in range(Q):
-    t, a, b = map(int, input().split())
-    T.append(t)
-    A.append(a)
-    B.append(b)
-
-# print(list(S[:N]))
-# print(T)
-# print(A)
-# print(B)
+TAB = [list(map(int,input().split())) for _ in range(Q)]
+S = [*S,*S[:N]] #* Sの前半を後ろにつける
+start = 0 #* start位置の管理(0 or N)
 
 for i in range(Q):
-    if (T[i] == 1):
-        a = S[A[i]-1]
-        b = S[B[i]-1]
-        S[A[i]-1] = b
-        S[B[i]-1] = a
-    if T[i] == 2:
-        a = S[:N]
-        b = S[-N:]
-        S[:N] = b
-        S[-N:] = a
-    # print(S)
+    T,A,B = TAB[i]
+    if T == 1:
+        a,b = S[start+A-1],S[start+B-1]
+        S[start+A-1],S[start+B-1] = b,a
+        if start+A+2*N-1 < 3*N:
+            S[start+A+2*N-1] = b
+        if start+B+2*N-1 < 3*N:
+            S[start+B+2*N-1] = a
+        if start+A-2*N-1 >= 0:
+            S[start+A-2*N-1] = b
+        if start+B-2*N-1 >= 0:
+            S[start+B-2*N-1] = a
+    if T == 2:
+        if start == 0:
+            start = N
+        else:
+            start = 0
+    # print(S,start)
 
-print(''.join(S))
+print(''.join(S[start:start+2*N]))
+# print(S)
