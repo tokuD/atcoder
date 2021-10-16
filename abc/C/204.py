@@ -1,25 +1,34 @@
-from itertools import permutations
+import sys
+sys.setrecursionlimit(10**7)
 N,M = map(int, input().split())
-AB = [tuple(map(int,input().split())) for i in range(M)]
-keiros = [[i+1]for i in range(N)] #? d1:都市i d2:その都市から行ける都市
+#* G[i]:都市iから行ける都市
+G = [[] for _ in range(N)]
+for _ in range(M):
+    a,b = map(lambda x:int(x)-1, input().split())
+    G[a].append(b)
 ans = 0
+def dfs(i):
 
-for ab in AB:
-    keiros[ab[0]-1].append(ab[1])
+    #* 訪問済の場合スキップ
+    if visited[i]:
+        return
 
-for k in range(len(keiros)):
-    for i in range(len(keiros[k])):
-        for j in range(len(keiros[keiros[k][i]-1])):
-            if not keiros[keiros[k][i]-1][j] in keiros[k]:
-                keiros[k].append(keiros[keiros[k][i]-1][j])
+    #* 訪問チェック&カウント
+    visited[i] = True
+    global ans
+    ans += 1
 
-for k in range(len(keiros)):
-    for i in range(len(keiros[k])):
-        for j in range(len(keiros[keiros[k][i]-1])):
-            if not keiros[keiros[k][i]-1][j] in keiros[k]:
-                keiros[k].append(keiros[keiros[k][i]-1][j])
+    #* 今いる都市iから行ける都市を探す
+    for nxt in G[i]:
+        dfs(nxt)
 
-for keiro in keiros:
-    ans += len(keiro)
+
+
+#* 各都市についてdfsで通れる都市を数える
+#* 計算量はO(N*N)
+for i in range(N):
+    #* スタート地点が都市iの場合
+    visited = [False]*N
+    dfs(i)
 
 print(ans)

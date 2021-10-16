@@ -1,39 +1,25 @@
+from collections import defaultdict
+from itertools import combinations
 N = int(input())
-x = []
-y = []
-
+X = defaultdict(list)
+Y = defaultdict(list)
+point = []
 for i in range(N):
-    xi,yi = map(int,input().split())
-    x.append(xi)
-    y.append(yi)
+    x,y = map(int,input().split())
+    Y[x].append(y)
+    X[y].append(x)
+    point.append([x,y])
 
-x.sort()
-y.sort()
+ans = 0
 
-samex = []
-nowx = x[0]
-countx = 1
-samey = []
-nowy = y[0]
-county = 1
-for i in range(1,N):
-    if nowx == x[i]:
-        countx += 1
-    else:
-        if countx>1:
-            samex.append(countx)
-        nowx = x[i]
-        countx = 1
-    if nowy == y[i]:
-        county += 1
-    else:
-        if county>1:
-            samey.append(county)
-        nowy = y[i]
-        county = 1
+for i,j in combinations(range(N), 2):
+    x0,y0 = point[i]
+    x1,y1 = point[j]
+    if x0 == x1 or y0 == y1:
+        continue
+    if x0 in X[y1] and x1 in X[y0]:
+        ans += 1
 
-if countx > 1:
-    samex.append(countx)
-if county > 1:
-    samey.append(county)
 
+
+print(ans//2)
