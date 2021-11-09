@@ -24,7 +24,7 @@ def main():
         for nxt,d in G[curr]:
             heapq.heappush(Q,(dis+d,nxt))
 
-    for d in distance:
+    for d in distance
         print(d)
 
 
