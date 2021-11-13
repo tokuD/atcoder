@@ -1,60 +1,65 @@
-from __future__ import annotations
-from typing import List,Union
+# from __future__ import annotations
+from typing import List,Union,Tuple,Dict,Set
 import sys
 input = sys.stdin.readline
 # from collections import defaultdict,deque
 # from itertools import permutations,combinations
 # from bisect import bisect_left,bisect_right
 # import heapq
-sys.setrecursionlimit(10**5)
+# sys.setrecursionlimit(10**5)
 
-class Node():
+class UnionFind():
 
-    def __init__(self, i:int, j:int):
-        self.i = i
-        self.j = j
-        self.root:Node = self
-        self.children:List[Node] = []
-        self.parent:Node = None
-        self.marked = False
+    def __init__(self, N:int):
+        self.par = [i for i in range(N)]
+        self.size = [1]*N
+        self.marked = [False]*N
 
-def root(node:Node)->Node:
-    pass
+    def root(self, x:int):
+        if self.par[x] == x: return x
+        self.par[x] = self.root(self.par[x])
+        return self.par[x]
+
+    def unite(self, x:int, y:int):
+        rx, ry = self.root(x), self.root(y)
+        if rx == ry: return
+        if self.size[rx] >= self.size[ry]:
+            self.par[ry] = rx
+            self.size[rx] += self.size[ry]
+        else:
+            self.par[rx] = ry
+            self.size[ry] += self.size[rx]
+
+    def issame(self, x:int, y:int):
+        if not self.marked[x]: return False
+        if not self.marked[y]: return False
+        return self.root(x) == self.root(y)
 
 def main():
+    dxdy = [(1,0),(-1,0),(0,1),(0,-1)]
     H,W = map(int, input().split())
-    nodes:List[List[Node]] = [[Node(i,j) for j in range(W)] for i in range(H)]
     Q = int(input())
+    unionfind = UnionFind(H*W)
     ans = []
-    dx = [1,-1,0,0]
-    dy = [0,0,1,-1]
     for _ in range(Q):
         q = list(map(lambda x:int(x)-1, input().split()))
         if q[0] == 0:
             r,c = q[1:]
-            nodes[r][c].marked = True
-
-            #* 4方向を見て赤マスがあれば自身を親に設定
-            for i in range(4):
-                node = nodes[r+dx[i]][c+dy[i]]
-                count = 0
-                if node.marked:
-                    count += 1
-                    #* 1個目は根を探索して自身をその根に付ける
-                    root1 = None
-                    if count == 1:
-                        root1 = root(node)
-                        nodes[r][c].root = root1
-                    #* 2個目があった場合は2個目の根に1個目の根を設定する
-                    if count > 1:
-                        node.root = root1
-        if q[0] == 1:
+            unionfind.marked[W*r+c] = True
+            for dx,dy in dxdy:
+                i,j = r+dx,c+dy
+                if 0<=i<H and 0<=j<W:
+                    if unionfind.marked[W*i+j]:
+                        unionfind.unite(W*r+c, W*i+j)
+        else:
             ra,ca,rb,cb = q[1:]
-            if nodes[ra][ca].root == nodes[rb][cb].root:
+            if unionfind.issame(W*ra+ca, W*rb+cb):
                 ans.append('Yes')
             else:
                 ans.append('No')
 
+    for a in ans:
+        print(a)
 
 if __name__ == '__main__':
     main()
